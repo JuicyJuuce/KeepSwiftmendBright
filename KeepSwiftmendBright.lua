@@ -132,9 +132,9 @@ local function BrightenCooldownManagerIcons()
         local iconObj = child.Icon or child.icon or child.IconTexture or child.iconTexture
         if iconObj and iconObj.GetTexture then
             local tex = iconObj:GetTexture()
-            if tex == SWIFTMEND_FILEID or tostring(tex) == tostring(SWIFTMEND_FILEID) then
+            --if tex == SWIFTMEND_FILEID or tostring(tex) == tostring(SWIFTMEND_FILEID) then
                 BrightenTexture(iconObj)
-            end
+            --end
         end
     end
 end
@@ -148,9 +148,9 @@ local function ReadCooldownManagerIcons()
         local iconObj = child.Icon or child.icon or child.IconTexture or child.iconTexture
         if iconObj and iconObj.GetTexture then
             local tex = iconObj:GetTexture()
-            if tex == SWIFTMEND_FILEID or tostring(tex) == tostring(SWIFTMEND_FILEID) then
+            --if tex == SWIFTMEND_FILEID or tostring(tex) == tostring(SWIFTMEND_FILEID) then
                 ReadTexture(iconObj)
-            end
+            --end
         end
     end
 end
