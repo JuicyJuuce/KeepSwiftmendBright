@@ -1,15 +1,15 @@
--- KeepSwiftmendBright — Event-only Build
--- Keeps Swiftmend bright on action bars and EssentialCooldownViewer
--- Uses only WoW events (no hooksecurefunc, no timers).
+-- KeepSwiftmendBright
+-- Keeps Swiftmend bright on action bars and Cooldown Manager
 
-local SPELL_ID = 18562              -- Swiftmend
+local SWIFTMEND_SPELLID = 18562
 local SWIFTMEND_FILEID = 134914     -- Swiftmend icon texture file ID
 local thisAddonName, ns = ...
 local thisAddonTitle = "Keep Swiftmend Bright"
+local KSB_DEBUG = false
+
 local last_texture_value = {}
 local current_texture_value = {}
 local current_event_name = ""
-local KSB_DEBUG = false
 
 ------------------------------------------------------------
 -- Helpers
@@ -77,46 +77,46 @@ end
 
 local function BrightenActionButtons()
     if ActionButtonUtil and ActionButtonUtil.GetActionButtonBySpellID then
-        local btn = ActionButtonUtil.GetActionButtonBySpellID(SPELL_ID)
+        local btn = ActionButtonUtil.GetActionButtonBySpellID(SWIFTMEND_SPELLID)
         if btn then
             BrightenTexture(btn.icon or btn.iconTexture)
             return
         end
     end
 
-    if 0 and ActionBarButtonEventsFrame and ActionBarButtonEventsFrame.frames then
+    --[[if ActionBarButtonEventsFrame and ActionBarButtonEventsFrame.frames then
         for _, btn in pairs(ActionBarButtonEventsFrame.frames) do
             if btn and btn.GetSpellId and btn.icon then
                 local ok, sid = pcall(btn.GetSpellId, btn)
-                if ok and sid == SPELL_ID then
+                if ok and sid == SWIFTMEND_SPELLID then
                     BrightenTexture(btn.icon)
                     return
                 end
             end
         end
-    end
+    end--]]
 end
 
 local function ReadActionButtons()
     if ActionButtonUtil and ActionButtonUtil.GetActionButtonBySpellID then
-        local btn = ActionButtonUtil.GetActionButtonBySpellID(SPELL_ID)
+        local btn = ActionButtonUtil.GetActionButtonBySpellID(SWIFTMEND_SPELLID)
         if btn then
             ReadTexture(btn.icon or btn.iconTexture)
             return
         end
     end
 
-    if 0 and ActionBarButtonEventsFrame and ActionBarButtonEventsFrame.frames then
+    --[[if ActionBarButtonEventsFrame and ActionBarButtonEventsFrame.frames then
         for _, btn in pairs(ActionBarButtonEventsFrame.frames) do
             if btn and btn.GetSpellId and btn.icon then
                 local ok, sid = pcall(btn.GetSpellId, btn)
-                if ok and sid == SPELL_ID then
+                if ok and sid == SWIFTMEND_SPELLID then
                     BrightenTexture(btn.icon)
                     return
                 end
             end
         end
-    end
+    end--]]
 end
 
 ------------------------------------------------------------
@@ -129,7 +129,21 @@ local function BrightenCooldownManagerIcons()
 
     local children = { root:GetChildren() }
     for _, child in ipairs(children) do
-        local iconObj = child.Icon or child.icon or child.IconTexture or child.iconTexture
+        --[[local debug_str = " "
+        if child.Icon then
+            debug_str = debug_str .. " Icon"
+        end
+        if child.icon then
+            debug_str = debug_str .. " icon"
+        end
+        if child.IconTexture then
+            debug_str = debug_str .. " IconTexture"
+        end
+        if child.iconTexture then
+            debug_str = debug_str .. " iconTexture"
+        end
+        debugPrint("KeepSwiftmendBright: found child with:" .. debug_str)--]]
+        local iconObj = child.Icon -- or child.icon or child.IconTexture or child.iconTexture
         if iconObj and iconObj.GetTexture then
             local tex = iconObj:GetTexture()
             --if tex == SWIFTMEND_FILEID or tostring(tex) == tostring(SWIFTMEND_FILEID) then
@@ -178,36 +192,64 @@ end
 ------------------------------------------------------------
 
 local f = CreateFrame("Frame")
-f:RegisterEvent("ADDON_LOADED")
-f:RegisterEvent("PLAYER_LOGIN")
-f:RegisterEvent("PLAYER_TARGET_CHANGED")   -- target swap (common dim cause)
-f:RegisterEvent("UNIT_AURA")               -- HoTs gained/lost
-f:RegisterEvent("SPELL_UPDATE_COOLDOWN")   -- Swiftmend cooldown change
-f:RegisterEvent("ACTIONBAR_UPDATE_USABLE") -- general usability updates
+function f:OnEvent(event, ...)
+    if self[event] then
+        self[event](self, event, ...)
+    else
+        otherEvents(event)
+    end
+end
+f:SetScript("OnEvent", f.OnEvent)
+
+--f:RegisterEvent("ADDON_LOADED")
+--f:RegisterEvent("PLAYER_ENTERING_WORLD")
+--f:RegisterEvent("CHAT_MSG_CHANNEL")
+
+
+--f:RegisterEvent("ADDON_LOADED")
+--f:RegisterEvent("PLAYER_LOGIN")
 f:RegisterEvent("SPELL_UPDATE_USABLE")     -- fallback
-f:RegisterEvent("ACTIONBAR_SLOT_CHANGED")  -- bar updates (e.g., talent swap)
 f:RegisterEvent("UNIT_TARGET")             -- when you or allies change targets
+f:RegisterEvent("SPELL_RANGE_CHECK_UPDATE")  --works
+f:RegisterEvent("UNIT_AURA")               -- HoTs gained/lost
+
+--f:RegisterEvent("PLAYER_TARGET_CHANGED")   -- target swap (common dim cause)
+--f:RegisterEvent("SPELL_UPDATE_COOLDOWN")   -- Swiftmend cooldown change
+--f:RegisterEvent("ACTIONBAR_UPDATE_USABLE") -- general usability updates
+--f:RegisterEvent("ACTIONBAR_SLOT_CHANGED")  -- bar updates (e.g., talent swap)
 --f:RegisterEvent("ACTIONBAR_UPDATE_STATE")  -- 
 --f:RegisterEvent("UNIT_MANA")               --
+
+--f:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN") --works
+--f:RegisterEvent("ACTION_RANGE_CHECK_UPDATE")  --works
+----f:RegisterEvent("AssistedCombatManager.OnAssistedHighlightSpellChange")
+--f:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+--f:RegisterEvent("PLAYER_SOFT_ENEMY_CHANGED")
+--f:RegisterEvent("PLAYER_SOFT_FRIEND_CHANGED")
+----f:RegisterEvent("ActionButton.OnActionChanged")
 --f:RegisterEvent("UPDATE_MOUSEOVER_UNIT")   --
+--f:RegisterEvent("GLOBAL_MOUSE_UP")       --
 
-
-f:SetScript("OnEvent", function(_, event)
-    if event == "ADDON_LOADED" then
-        if addOnName == thisAddonName then -- need addOnName passed to this function
-            --self.category, self.layout = Settings.RegisterVerticalLayoutCategory(thisAddonTitle)
-            --Settings.RegisterAddOnCategory(self.category)
-        end
-    elseif event == "PLAYER_LOGIN" then
-        -- Initial scan soon after load (some icons spawn slightly late)
-        --C_Timer.After(0.1, DoRefresh)
-        --C_Timer.After(0.3, DoRefresh)
-    else
-        --debugPrint("Event name: " .. event)
-        current_event_name = event
-        DoRefresh()
+function f:ADDON_LOADED(event, addOnName)
+    print("KeepSwiftmendBright: in " .. event .. " for addon:" .. addOnName)
+    if addOnName == thisAddonName then
+        --self.category, self.layout = Settings.RegisterVerticalLayoutCategory(thisAddonTitle)
+        --Settings.RegisterAddOnCategory(self.category)
     end
-end)
+end
+
+function f:PLAYER_LOGIN(event)
+    print("KeepSwiftmendBright: in PLAYER_LOGIN")
+    -- Initial scan soon after load (some icons spawn slightly late)
+    --C_Timer.After(0.1, DoRefresh)
+    --C_Timer.After(0.3, DoRefresh)
+end
+
+function otherEvents(event)
+    print("KeepSwiftmendBright: in event: " .. event)
+    current_event_name = event
+    DoRefresh()
+end
 
 ------------------------------------------------------------
 -- Manual refresh command
