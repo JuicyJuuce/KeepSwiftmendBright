@@ -212,9 +212,9 @@ f:RegisterEvent("SPELL_UPDATE_USABLE")     -- fallback
 f:RegisterEvent("UNIT_TARGET")             -- when you or allies change targets
 f:RegisterEvent("SPELL_RANGE_CHECK_UPDATE")  --works
 f:RegisterEvent("UNIT_AURA")               -- HoTs gained/lost
+f:RegisterEvent("SPELL_UPDATE_COOLDOWN")   -- Swiftmend cooldown change
 
 --f:RegisterEvent("PLAYER_TARGET_CHANGED")   -- target swap (common dim cause)
---f:RegisterEvent("SPELL_UPDATE_COOLDOWN")   -- Swiftmend cooldown change
 --f:RegisterEvent("ACTIONBAR_UPDATE_USABLE") -- general usability updates
 --f:RegisterEvent("ACTIONBAR_SLOT_CHANGED")  -- bar updates (e.g., talent swap)
 --f:RegisterEvent("ACTIONBAR_UPDATE_STATE")  -- 
@@ -222,13 +222,14 @@ f:RegisterEvent("UNIT_AURA")               -- HoTs gained/lost
 
 --f:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN") --works
 --f:RegisterEvent("ACTION_RANGE_CHECK_UPDATE")  --works
-----f:RegisterEvent("AssistedCombatManager.OnAssistedHighlightSpellChange")
 --f:RegisterEvent("NAME_PLATE_UNIT_ADDED")
 --f:RegisterEvent("PLAYER_SOFT_ENEMY_CHANGED")
 --f:RegisterEvent("PLAYER_SOFT_FRIEND_CHANGED")
+--f:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+--f:RegisterEvent("GLOBAL_MOUSE_DOWN")
+--f:RegisterEvent("GLOBAL_MOUSE_UP")
+----f:RegisterEvent("AssistedCombatManager.OnAssistedHighlightSpellChange")
 ----f:RegisterEvent("ActionButton.OnActionChanged")
---f:RegisterEvent("UPDATE_MOUSEOVER_UNIT")   --
---f:RegisterEvent("GLOBAL_MOUSE_UP")       --
 
 --[[function f:ADDON_LOADED(event, addOnName)
     print("KeepSwiftmendBright: in " .. event .. " for addon:" .. addOnName)
