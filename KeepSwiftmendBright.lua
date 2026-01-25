@@ -2,11 +2,12 @@
 -- Keeps Swiftmend bright on action bars and Cooldown Manager
 
 local SWIFTMEND_SPELLID = 18562
---local SWIFTMEND_FILEID = 134914     -- Swiftmend icon texture file ID
+local SWIFTMEND_FILEID = 134914     -- Swiftmend icon texture file ID
 local thisAddonName, ns = ...
 --local thisAddonTitle = "Keep Swiftmend Bright"
 local KSB_DEBUG = false
 
+local CDM_swiftmend_obj = nil
 --local last_texture_value = {}
 --local current_texture_value = {}
 --local current_event_name = ""
@@ -123,33 +124,26 @@ end--]]
 -- Cooldown Manager
 ------------------------------------------------------------
 
-local function BrightenCooldownManagerIcons()
+local function FindSwiftmendInCooldownManager()
     local root = _G["EssentialCooldownViewer"]
     if not root or not root.GetChildren then return end
 
     local children = { root:GetChildren() }
     for _, child in ipairs(children) do
-        --[[local debug_str = " "
-        if child.Icon then
-            debug_str = debug_str .. " Icon"
-        end
-        if child.icon then
-            debug_str = debug_str .. " icon"
-        end
-        if child.IconTexture then
-            debug_str = debug_str .. " IconTexture"
-        end
-        if child.iconTexture then
-            debug_str = debug_str .. " iconTexture"
-        end
-        debugPrint("KeepSwiftmendBright: found child with:" .. debug_str)--]]
         local iconObj = child.Icon -- or child.icon or child.IconTexture or child.iconTexture
         if iconObj and iconObj.GetTexture then
             local tex = iconObj:GetTexture()
-            --if tex == SWIFTMEND_FILEID or tostring(tex) == tostring(SWIFTMEND_FILEID) then
-                BrightenTexture(iconObj)
-            --end
+            if tex == SWIFTMEND_FILEID or tostring(tex) == tostring(SWIFTMEND_FILEID) then
+                CDM_swiftmend_obj = iconObj
+                return
+            end
         end
+    end
+end
+
+local function BrightenCooldownManagerIcons()
+    if CDM_swiftmend_obj then
+        BrightenTexture(CDM_swiftmend_obj)
     end
 end
 
@@ -201,13 +195,13 @@ function f:OnEvent(event, ...)
 end
 f:SetScript("OnEvent", f.OnEvent)
 
---f:RegisterEvent("ADDON_LOADED")
+f:RegisterEvent("ADDON_LOADED")
+--f:RegisterEvent("PLAYER_LOGIN")
 --f:RegisterEvent("PLAYER_ENTERING_WORLD")
+f:RegisterEvent("PLAYER_REGEN_DISABLED")
 --f:RegisterEvent("CHAT_MSG_CHANNEL")
 
 
---f:RegisterEvent("ADDON_LOADED")
---f:RegisterEvent("PLAYER_LOGIN")
 f:RegisterEvent("SPELL_UPDATE_USABLE")     -- fallback
 f:RegisterEvent("UNIT_TARGET")             -- when you or allies change targets
 f:RegisterEvent("SPELL_RANGE_CHECK_UPDATE")  --works
@@ -231,15 +225,20 @@ f:RegisterEvent("SPELL_UPDATE_COOLDOWN")   -- Swiftmend cooldown change
 ----f:RegisterEvent("AssistedCombatManager.OnAssistedHighlightSpellChange")
 ----f:RegisterEvent("ActionButton.OnActionChanged")
 
---[[function f:ADDON_LOADED(event, addOnName)
+function f:ADDON_LOADED(event, addOnName)
     print("KeepSwiftmendBright: in " .. event .. " for addon:" .. addOnName)
     if addOnName == thisAddonName then
         --self.category, self.layout = Settings.RegisterVerticalLayoutCategory(thisAddonTitle)
         --Settings.RegisterAddOnCategory(self.category)
+        FindSwiftmendInCooldownManager()
     end
 end
 
-function f:PLAYER_LOGIN(event)
+function f:PLAYER_REGEN_DISABLED(event)
+    FindSwiftmendInCooldownManager()
+end
+
+--[[function f:PLAYER_LOGIN(event)
     print("KeepSwiftmendBright: in PLAYER_LOGIN")
     -- Initial scan soon after load (some icons spawn slightly late)
     --C_Timer.After(0.1, DoRefresh)
