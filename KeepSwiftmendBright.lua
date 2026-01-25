@@ -1,5 +1,10 @@
 -- KeepSwiftmendBright
 -- Keeps Swiftmend bright on action bars and Cooldown Manager
+--
+-- TO-DO:
+--  - Add options panel to configure which icons to brighten
+--  - See if multiple Swiftmend buttons on actions bars can be handled
+--  - Figure out why memory usage ticks up over time
 
 local SWIFTMEND_SPELLID = 18562
 local SWIFTMEND_FILEID = 134914     -- Swiftmend icon texture file ID
@@ -198,6 +203,7 @@ f:SetScript("OnEvent", f.OnEvent)
 f:RegisterEvent("ADDON_LOADED")
 --f:RegisterEvent("PLAYER_LOGIN")
 --f:RegisterEvent("PLAYER_ENTERING_WORLD")
+f:RegisterEvent("PLAYER_ENTERING_WORLD")
 f:RegisterEvent("PLAYER_REGEN_DISABLED")
 --f:RegisterEvent("CHAT_MSG_CHANNEL")
 
@@ -226,7 +232,7 @@ f:RegisterEvent("SPELL_UPDATE_COOLDOWN")   -- Swiftmend cooldown change
 ----f:RegisterEvent("ActionButton.OnActionChanged")
 
 function f:ADDON_LOADED(event, addOnName)
-    print("KeepSwiftmendBright: in " .. event .. " for addon:" .. addOnName)
+    print("KSB: in " .. event .. " for addon:" .. addOnName)
     if addOnName == thisAddonName then
         --self.category, self.layout = Settings.RegisterVerticalLayoutCategory(thisAddonTitle)
         --Settings.RegisterAddOnCategory(self.category)
@@ -234,8 +240,12 @@ function f:ADDON_LOADED(event, addOnName)
     end
 end
 
-function f:PLAYER_REGEN_DISABLED(event)
+function f:PLAYER_ENTERING_WORLD(event)
     FindSwiftmendInCooldownManager()
+end
+
+function f:PLAYER_REGEN_DISABLED(event)
+    --FindSwiftmendInCooldownManager()
 end
 
 --[[function f:PLAYER_LOGIN(event)
@@ -246,7 +256,7 @@ end
 end--]]
 
 function otherEvents(event)
-    print("KeepSwiftmendBright: in event: " .. event)
+    debugPrint("KeepSwiftmendBright: in event: " .. event)
     --current_event_name = event
     DoRefresh()
 end
@@ -260,6 +270,11 @@ SLASH_KEEPSWIFTMENDBRIGHT2 = "/keepswiftmendbright"
 --SLASH_KEEPSWIFTMENDBRIGHTREAD1 = "/ksbread"
 
 SlashCmdList.KEEPSWIFTMENDBRIGHT = function()
+    if CDM_swiftmend_obj then
+        print("KeepSwiftmendBright: Cooldown Manager Swiftmend icon found.")
+    else
+        print("KeepSwiftmendBright: Cooldown Manager Swiftmend icon NOT found.")
+    end
     DoRefresh()
     print("KeepSwiftmendBright: manual refresh executed.")
 end
