@@ -5,6 +5,7 @@
 --  - Add options panel to configure which icons to brighten
 --  - See if multiple Swiftmend buttons on actions bars can be handled
 --  - Figure out why memory usage ticks up over time
+--  - in FindSwiftmendInCooldownManager(), check if tex is secret
 
 local SWIFTMEND_SPELLID = 18562
 local SWIFTMEND_FILEID = 134914     -- Swiftmend icon texture file ID
@@ -109,9 +110,9 @@ f:RegisterEvent("UNIT_AURA")               -- HoTs gained/lost
 f:RegisterEvent("SPELL_UPDATE_COOLDOWN")   -- Swiftmend cooldown change
 
 function f:ADDON_LOADED(event, addOnName)
-    print("KSB: in " .. event .. " for addon:" .. addOnName)
     if addOnName == thisAddonName then
-        FindSwiftmendInCooldownManager()
+        print("KSB: in " .. event .. " for addon:" .. addOnName)
+        --FindSwiftmendInCooldownManager()
     end
 end
 

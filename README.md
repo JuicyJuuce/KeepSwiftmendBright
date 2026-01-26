@@ -1,2 +1,2 @@
 # KeepSwiftmendBright
- World of Warcraft AddOn that will keep the Swiftmend ability on an action bar un-dimmed even when there is no ally with a HoT currently targeted
+ World of Warcraft addon that keeps the Swiftmend ability on action bars and cooldown manager un-dimmed even when there is no ally with a HoT currently targeted.
