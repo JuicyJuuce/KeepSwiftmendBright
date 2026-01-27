@@ -26,7 +26,9 @@ end
 
 local function BrightenTexture(tex)
     if tex and tex.SetVertexColor then
+        debugPrint("KSB: Brightening texture:", tex)
         tex:SetVertexColor(1, 1, 1)
+        debugPrint("KSB: tex:GetVertexColor = ", tex:GetVertexColor())
     end
     if tex and tex.SetDesaturated then
         tex:SetDesaturated(false)
@@ -69,6 +71,7 @@ local function FindSwiftmendInCooldownManager()
 end
 
 local function BrightenCooldownManagerIcons()
+    debugPrint("KSB: in BCMI(): CDM_swiftmend_obj =", CDM_swiftmend_obj)
     if CDM_swiftmend_obj then
         BrightenTexture(CDM_swiftmend_obj)
     end
@@ -117,7 +120,20 @@ function f:ADDON_LOADED(event, addOnName)
 end
 
 function f:PLAYER_ENTERING_WORLD(event)
-    FindSwiftmendInCooldownManager()
+    -- Initial scan soon after load (some icons spawn slightly late)
+    --C_Timer.After(0.1, DoRefresh)
+    --C_Timer.After(0.3, DoRefresh)
+
+    print("SWIFTMEND_SPELLID =", SWIFTMEND_SPELLID)
+    print("SWIFTMEND_FILEID =", SWIFTMEND_FILEID)
+    print("thisAddonName =", thisAddonName)
+    print("ns =", ns)
+    print("KSB_DEBUG =", KSB_DEBUG)
+    print("CDM_swiftmend_obj =", CDM_swiftmend_obj)
+
+    --CDM_swiftmend_obj = nil
+    C_Timer.After(3, FindSwiftmendInCooldownManager)
+    --FindSwiftmendInCooldownManager()
 end
 
 function f:PLAYER_REGEN_DISABLED(event)
