@@ -1,11 +1,11 @@
 ## Interface: 120000
 ## Title: Keep Swiftmend Bright
-## Notes: Keep the Swiftmend ability on an action bar un-dimmed even when there is no ally with a HoT currently targeted
+## Notes: Keeps the Swiftmend ability on action bars and cooldown manager un-dimmed even when there is no ally with a HoT currently targeted
 ## Author: JuicyJuuce
 ## Version: @project-version@
 ## IconTexture: Interface\AddOns\KeepSwiftmendBright\KeepSwiftmendBright.png
-## SavedVariables: KeepSwiftmendBright_SavedVars
-## AddonCompartmentFunc: KeepSwiftmendBright_OnAddonCompartmentClick
+## # SavedVariables: KeepSwiftmendBright_SavedVars
+## # AddonCompartmentFunc: KeepSwiftmendBright_OnAddonCompartmentClick
 
 # KeepSwiftmendBright.xml
 KeepSwiftmendBright.lua
